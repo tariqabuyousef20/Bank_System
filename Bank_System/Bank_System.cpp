@@ -1,10 +1,10 @@
-﻿#include <iostream>
+#include <iostream>
 #include <string>
 #include "Person.h"
 #include "Client.h"
 #include "Employee.h"
 #include "Admin.h"
-#include"Validation.h"
+#include "Validation.h"
 
 using namespace std;
 
@@ -20,7 +20,7 @@ int clientCount = 0;
 int employeeCount = 0;
 int adminCount = 0;
 
-//  قائمة العميل (Client Menu)
+// قائمة العميل (Client Menu)
 void clientMenu() {
     bool clientRunning = true;
     while (clientRunning) {
@@ -39,43 +39,34 @@ void clientMenu() {
         cin >> clientChoice;
 
         switch (clientChoice) {
-        case 1: {
+        case 1:
             cout << "Enter Client ID to view details: ";
             cin >> searchId;
-            bool found = false;
             for (int i = 0; i < clientCount; i++) {
                 if (clients[i].getId() == searchId) {
                     clients[i].display();
-                    found = true;
                     break;
                 }
             }
-            if (!found) cout << "Error: Client ID not found!\n";
             break;
-        }
 
-        case 2: {
+        case 2:
             cout << "Enter Client ID for deposit: ";
             cin >> searchId;
-            bool found = false;
             for (int i = 0; i < clientCount; i++) {
                 if (clients[i].getId() == searchId) {
                     cout << "Enter deposit amount: ";
                     cin >> amount;
                     clients[i].deposit(amount);
                     cout << "Deposit successful! New balance: " << clients[i].getBalance() << " EGP\n";
-                    found = true;
                     break;
                 }
             }
-            if (!found) cout << "Error: Client ID not found!\n";
             break;
-        }
 
-        case 3: {
+        case 3:
             cout << "Enter Client ID for withdrawal: ";
             cin >> searchId;
-            bool found = false;
             for (int i = 0; i < clientCount; i++) {
                 if (clients[i].getId() == searchId) {
                     cout << "Enter withdraw amount: ";
@@ -87,14 +78,10 @@ void clientMenu() {
                         clients[i].withdraw(amount);
                         cout << "Withdrawal successful! New balance: " << clients[i].getBalance() << " EGP\n";
                     }
-                    found = true;
                     break;
                 }
             }
-            if (!found) cout << "Error: Client ID not found!\n";
             break;
-        }
-
         case 4: {
             cout << "Enter Sender Client ID: ";
             cin >> senderId;
@@ -105,6 +92,7 @@ void clientMenu() {
 
             Client* sender = nullptr;
             Client* receiver = nullptr;
+
             for (int i = 0; i < clientCount; i++) {
                 if (clients[i].getId() == senderId) sender = &clients[i];
                 if (clients[i].getId() == receiverId) receiver = &clients[i];
@@ -122,21 +110,17 @@ void clientMenu() {
             break;
         }
 
-        case 5: {
+        case 5:
             cout << "Enter Client ID to check balance: ";
             cin >> searchId;
-            bool found = false;
             for (int i = 0; i < clientCount; i++) {
                 if (clients[i].getId() == searchId) {
                     cout << "Current balance: " << clients[i].getBalance() << " EGP\n";
-                    found = true;
                     break;
                 }
             }
-            if (!found) cout << "Error: Client ID not found!\n";
             break;
-        }
-
+             
         case 6:
             if (clientCount == 0) {
                 cout << "No clients registered yet.\n";
@@ -149,6 +133,7 @@ void clientMenu() {
             }
             break;
 
+
         case 7:
             cout << "Returning to main menu...\n";
             clientRunning = false;
@@ -159,6 +144,7 @@ void clientMenu() {
         }
     }
 }
+
 int main() {
     bool running = true;
     int id;
@@ -202,13 +188,21 @@ int main() {
                 }
             } while (idExists);
 
-            cout << "Enter Client Name: ";
-            cin.ignore();
-            getline(cin, name);
-            cout << "Enter Password: ";
-            cin >> password;
-            cout << "Enter Initial Balance (minimum 1500 EGP): ";
-            cin >> balance;
+            do {
+                cout << "Enter Client Name (4-20 characters): ";
+                cin.ignore();
+                getline(cin, name);
+            } while (name.length() < 4 || name.length() > 20);
+
+            do {
+                cout << "Enter Password (8-20 characters): ";
+                cin >> password;
+            } while (password.length() < 8 || password.length() > 20);
+
+            do {
+                cout << "Enter Initial Balance (minimum 1500 EGP): ";
+                cin >> balance;
+            } while (balance < 1500);
 
             clients[clientCount] = Client(id, name, password, balance);
             cout << "Client account successfully created.\n";
@@ -219,39 +213,44 @@ int main() {
             break;
 
         case 2:
-            cout << "\nEmployee Registration:\n";
-            cout << "Enter Employee ID: ";
-            cin >> id;
-            cout << "Enter Employee Name: ";
-            cin.ignore();
-            getline(cin, name);
-            cout << "Enter Password: ";
-            cin >> password;
-            cout << "Enter Salary: ";
-            cin >> salary;
-
-            employees[employeeCount] = Employee(id, name, password, salary);
-            cout << "Employee account successfully created.\n";
-            employees[employeeCount].display();
-            employeeCount++;
-            break;
-
         case 3:
-            cout << "\nAdmin Registration:\n";
-            cout << "Enter Admin ID: ";
-            cin >> id;
-            cout << "Enter Admin Name: ";
-            cin.ignore();
-            getline(cin, name);
-            cout << "Enter Password: ";
-            cin >> password;
-            cout << "Enter Salary: ";
-            cin >> salary;
+            if ((userType == 2 && employeeCount >= MAX_EMPLOYEES) || (userType == 3 && adminCount >= MAX_ADMINS)) {
+                cout << "Storage is full! Cannot add more.\n";
+                break;
+            }
 
-            admins[adminCount] = Admin(id, name, password, salary);
-            cout << "Admin account successfully created.\n";
-            admins[adminCount].display();
-            adminCount++;
+            cout << (userType == 2 ? "\nEmployee Registration:\n" : "\nAdmin Registration:\n");
+            cout << "Enter ID: ";
+            cin >> id;
+
+            do {
+                cout << "Enter Name (4-20 characters): ";
+                cin.ignore();
+                getline(cin, name);
+            } while (name.length() < 4 || name.length() > 20);
+
+            do {
+                cout << "Enter Password (8-20 characters): ";
+                cin >> password;
+            } while (password.length() < 8 || password.length() > 20);
+
+            do {
+                cout << "Enter Salary (minimum 5000 EGP): ";
+                cin >> salary;
+            } while (salary < 5000);
+
+            if (userType == 2) {
+                employees[employeeCount] = Employee(id, name, password, salary);
+                cout << "Employee account successfully created.\n";
+                employees[employeeCount].display();
+                employeeCount++;
+            }
+            else {
+                admins[adminCount] = Admin(id, name, password, salary);
+                cout << "Admin account successfully created.\n";
+                admins[adminCount].display();
+                adminCount++;
+            }
             break;
 
         case 4:
